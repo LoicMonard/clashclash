@@ -36,7 +36,13 @@ export default {
   name: 'home',
   data: () => ({
     join: true,
-    show: true
+    rooms: [
+      { title: "Room n°1", public: false, fighters: 16 },
+      { title: "Room n°2", public: true, fighters: 32 },
+      { title: "Room n°3", public: true, fighters: 4 },
+      { title: "Room n°4", public: false, fighters: 16 },
+      { title: "Room n°5", public: false, fighters: 16 }
+    ]
   }),
   components: {
   }

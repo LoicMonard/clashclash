@@ -3,26 +3,48 @@
     <div class="lane">
       <div class="fighters">
         <div
-          class="fighter"
+          v-bind:class="`fighter _ ${fighter.id} ${fighter.status}`"
           v-for="fighter in fighters"
-          :key="fighter.name">
+          :key="fighter.name"
+          v-bind:style="{transform: `translate(${fighter.x}px,${fighter.y}px)`}">
           <img src="../assets/spyware.svg">
           <span class="name">
             {{ fighter.name }}
           </span>
-          <img 
-            class="fire"
-            v-if="fighter.active"
-            v-for="i in 10"
-            :key="i"
-            src="../assets/fire.svg"
-            v-bind:style="{left: Math.floor(Math.random() * 80) -40 + 'px', animationDelay: Math.random() * 1 + 's' }">
+          <div
+            class="fires"
+            v-if="isActiveFighter(fighter)">
+            <img 
+              class="fire"
+              v-for="i in 10"
+              :key="i"
+              src="../assets/fire.svg"
+              v-bind:style="{left: Math.floor(Math.random() * 80) -40 + 'px', animationDelay: Math.random() * 1 + 's' }">
+          </div>
         </div>
       </div>
     </div>
-    <button class="filled">
-      START
+    <button 
+      class="filled"
+      @click="nextStep()">
+      Next
     </button>
+    <div 
+      class="choices"
+      v-if="activeFighters.length">
+      <div 
+        class="left"
+        @click="voteLeft()">
+        <span>{{ this.activeFighters[0].name }}</span>
+        <span>{{ this.activeFighters[0].count }}</span>
+      </div>
+      <div 
+        class="right"
+        @click="voteRight()">
+        <span>{{ this.activeFighters[1].name }}</span>
+        <span>{{ this.activeFighters[1].count }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -31,35 +53,64 @@ export default {
   name: 'board',
   data: () => ({
     fighters: [
-      { name: "Fighter 1", url: "", active: true },
-      { name: "Fighter 2", url: "", active: false },
-      { name: "Fighter 3", url: "", active: false },
-      { name: "Fighter 4", url: "", active: true },
-      { name: "Fighter 5", url: "", active: false },
-      { name: "Fighter 6", url: "", active: false },
-      { name: "Fighter 7", url: "", active: false },
-      { name: "Fighter 8", url: "", active: false },
-      { name: "Fighter 9", url: "", active: false },
-      { name: "Fighter 10", url: "", active: false },
-      { name: "Fighter 11", url: "", active: false },
-      { name: "Fighter 12", url: "", active: false },
-      { name: "Fighter 13", url: "", active: false },
-      { name: "Fighter 14", url: "", active: false },
-      { name: "Fighter 15", url: "", active: false },
-      { name: "Fighter 16", url: "", active: false }
+      { id: 0, name: "Fighter 1", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 1, name: "Fighter 2", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 2, name: "Fighter 3", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 3, name: "Fighter 4", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 4, name: "Fighter 5", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 5, name: "Fighter 6", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 6, name: "Fighter 7", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 7, name: "Fighter 8", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 8, name: "Fighter 9", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 9, name: "Fighter 10", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 10, name: "Fighter 11", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 11, name: "Fighter 12", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 12, name: "Fighter 13", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 13, name: "Fighter 14", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 14, name: "Fighter 15", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" },
+      { id: 15, name: "Fighter 16", url: "", active: false, x: 0, y: 0, count: 0, status: "alive" }
     ],
     schema: {
 
-    }
+    },
+    activeGame: false,
+    activeFighters: [],
+    step: 0,
+    
   }),
   computed: {
-    randomLeft: function() {
-      return Math.floor(Math.random() * 200) -100;
-    }
   },
   methods: {
-    startTournament() {
+    nextStep() {
+      if(this.activeFighters.length) {
+        if(this.activeFighters[0].count > this.activeFighters[1].count) {
+          this.fighters[this.activeFighters[1].id].status = "dead";
+          this.fighters[this.activeFighters[0].id].x += 32;
+          this.fighters[this.activeFighters[1].id].y += 100;
+        } else {
+          this.fighters[this.activeFighters[0].id].status = "dead";
+          this.fighters[this.activeFighters[1].id].x -= 32;
+          this.fighters[this.activeFighters[0].id].y += 100;
+        }
+      }
 
+      if(this.step < this.fighters.length) {
+        this.activeFighters = [this.fighters[this.step], this.fighters[this.step + 1]]
+        this.fighters[this.activeFighters[0].id].y -= 100;
+        this.fighters[this.activeFighters[1].id].y -= 100;
+        this.step += 2;
+      } else {
+        this.activeFighters = [];
+      }
+    },
+    isActiveFighter: function(fighter) {
+      return this.activeFighters.includes(fighter)
+    },
+    voteLeft() {
+      this.activeFighters[0].count += 1;
+    },
+    voteRight() {
+      this.activeFighters[1].count += 1;
     }
   }
 }
@@ -88,7 +139,12 @@ export default {
         border-radius: 50%;
         background-color: rgb(88, 88, 88);
         transform: translateX(0px);
-        transition: all .3s ease;
+        transition: all 1s ease;
+        &.dead {
+          img {
+            filter: grayscale(1);
+          }
+        }
         img {
           width: 50px;
           border-radius: 50%;
@@ -106,19 +162,12 @@ export default {
         }
         .fire {
           position: absolute;
+          opacity: 0;
           z-index: -2;
           height: 25px;
           animation: fireing 1s linear infinite;
           animation-delay: random(5)s;
         }
-        // $var: 0;
-        // @for $i from 0 through 10 {
-        //   .fire {
-        //     animation: fireing 1s ease infinite;
-        //     animation-delay: #{$var}s;
-        //     $var: $var + 1;
-        //   }
-        // }
         &:hover {
           .name {
             opacity: 1;
@@ -126,6 +175,27 @@ export default {
           }
         }
       }
+    }
+  }
+  .choices {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    .left, .right {
+      width: 50%;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .left {
+      background-color: #FF7675;
+    }
+    .right {
+      background-color: #42aaf5;
     }
   }
 }

@@ -24,55 +24,58 @@ html, body {
 }
 h1 {
   font-weight: 500;
+  font-family: niveau-grotesk-small-caps, sans-serif;
   color: rgb(223, 223, 223);
 }
 h2 {
-    font-weight: 500;
-    color: #2b2b2b;
+  font-weight: 500;
+  font-family: niveau-grotesk-small-caps, sans-serif;
+  color: #2b2b2b;
 }
 h3 {
-    font-weight: 300;
-    color: #fff;
+  font-weight: 300;
+  font-family: niveau-grotesk-small-caps, sans-serif;
+  color: #fff;
 }
 button {
-    border: 1px solid #ff7675;
-    border-radius: 4px;
-    color: #ff7675 !important;
-    padding: 8px 20px;
-    margin: 10px 0;
-    font-size: 16px;
-    outline: inherit;
-    color: inherit;
-    background-color: inherit;
-    text-transform: lowercase;
-    font-family: niveau-grotesk-small-caps, sans-serif;
-    font-weight: 400;
-    font-style: normal;
-    cursor: pointer;
-    transition: all .2s ease;
-    user-select: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    i {
-      font-size: 14px;
-      margin-left: 4px;
-    }
+  border: 1px solid #ff7675;
+  border-radius: 4px;
+  color: #ff7675 !important;
+  padding: 8px 20px;
+  margin: 10px 0;
+  font-size: 16px;
+  outline: inherit;
+  color: inherit;
+  background-color: inherit;
+  text-transform: lowercase;
+  font-family: niveau-grotesk-small-caps, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  cursor: pointer;
+  transition: all .2s ease;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  i {
+    font-size: 14px;
+    margin-left: 4px;
+  }
 }
 button.rounded {
-    border-radius: 16px;
+  border-radius: 16px;
 }
 button.filled {
-    background-color: #ff7675;
-    color: #fff !important;
+  background-color: #ff7675;
+  color: #fff !important;
 }
 button:hover {
-    background: #ff7675;
-    color: #fff !important;
+  background: #ff7675;
+  color: #fff !important;
 }
 button.filled:hover {
-    background: inherit;
-    color: #ff7675 !important;
+  background: inherit;
+  color: #ff7675 !important;
 }
 input[type=text], input[type=email], input[type=password] {
   border: 1px solid #000;

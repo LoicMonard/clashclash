@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    Home
   </div>
 </template>
 
@@ -10,3 +11,7 @@ export default {
   }
 }
 </script>
+
+<style lang="sass" scoped>
+
+</style>

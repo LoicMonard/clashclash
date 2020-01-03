@@ -102,7 +102,6 @@ input[type=text], input[type=email], input[type=password] {
 }
 label {
   font-family: niveau-grotesk-small-caps, sans-serif;
-  width: 100%;
   margin: 6px 0;
   text-align: left;
   color: #5f5f5f;

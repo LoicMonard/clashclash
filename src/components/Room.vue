@@ -15,7 +15,7 @@
       <img 
         src="../assets/safe.svg"
         v-else>
-      <button>Join</button>
+      <button @click="joinRoom()">Join</button>
     </div>
   </div>
 </template>
@@ -25,7 +25,12 @@ export default {
   props: ['room'],
   data: () => ({
     color: "red"
-  })
+  }),
+  methods: {
+    joinRoom() {
+      this.$router.push('board');
+    }
+  }
 }
 </script>
 

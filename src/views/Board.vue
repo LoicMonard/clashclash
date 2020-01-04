@@ -19,7 +19,7 @@
               class="fire"
               v-for="i in 10"
               :key="i"
-              src="../assets/clean.svg"
+              src="../assets/lightning.svg"
               v-bind:style="{left: Math.floor(Math.random() * 80) -40 + 'px', animationDelay: Math.random() * 1 + 's' }">
           </div>
         </div>
@@ -42,6 +42,15 @@
           v-if="activeFighters.length">
           <span>{{ this.activeFighters[0].name }}</span>
           <span>{{ this.activeFighters[0].count }}</span>
+          <div
+            class="assets">
+            <img 
+              class="asset"
+              v-for="i in 20"
+              :key="i"
+              src="../assets/fire.svg"
+              v-bind:style="{left: Math.floor(Math.random() * 100) + 1 + '%', animationDelay: Math.random() * 1 + 's' }">
+          </div>
         </div>
         <div 
           class="wrapper"
@@ -58,6 +67,15 @@
           v-if="activeFighters.length">
           <span>{{ this.activeFighters[1].name }}</span>
           <span>{{ this.activeFighters[1].count }}</span>
+          <div
+            class="assets">
+            <img 
+              class="asset"
+              v-for="i in 20"
+              :key="i"
+              src="../assets/water-drop.svg"
+              v-bind:style="{left: Math.floor(Math.random() * 100) + 1 + '%', animationDelay: Math.random() * 1 + 's' }">
+          </div>
         </div>
         <div 
           class="wrapper"
@@ -223,7 +241,7 @@ export default {
           opacity: 0;
           z-index: -2;
           height: 25px;
-          animation: fireing 1s linear infinite;
+          animation: sparkling 1s linear infinite;
           animation-delay: random(5)s;
         }
         &:hover {
@@ -255,33 +273,72 @@ export default {
       min-width: 25%;
       height: 100px;
       background-color: rgb(15, 15, 15);
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      transition: all .5s ease;
+      overflow: hidden;
+      transition: all 2s ease;
       > div {
         display: flex;
         flex-direction: column;
       }
+      .wrapper {
+        .assets {
+          .asset {
+            position: absolute;
+            opacity: 0;
+            height: 25px;
+            z-index: 2;
+            animation-delay: random(5)s;
+          }
+        }
+      }
     }
     .left {
       width: 50%;
+      .asset {
+        animation: fireing 1s linear infinite;
+      }
     }
     .right {
       flex: 1;
+      .asset {
+        animation: watering 1s linear infinite;
+      }
     }
     
   }
 }
 
-@keyframes fireing {
+@keyframes sparkling {
   from {
     transform: translateY(60px) scale(1);
     opacity: 0;
   } to {
     transform: translateY(-30px) scale(1.25);
+    opacity: 1;
+  }
+}
+
+@keyframes fireing {
+  from {
+    transform: translateY(50px) scale(1);
+    opacity: 0;
+  } to {
+    transform: translateY(-100px) scale(1.25);
+    opacity: 1;
+  }
+}
+
+@keyframes watering {
+  from {
+    transform: translateY(-130px) scale(1);
+    opacity: 0;
+  } to {
+    transform: translateY(0px) scale(1.25);
     opacity: 1;
   }
 }

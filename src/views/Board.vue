@@ -1,5 +1,6 @@
 <template>
   <div class="board">
+    <h3>CLASHCLASH</h3>
     <div class="lane">
       <div class="fighters">
         <div
@@ -18,7 +19,7 @@
               class="fire"
               v-for="i in 10"
               :key="i"
-              src="../assets/fire.svg"
+              src="../assets/clean.svg"
               v-bind:style="{left: Math.floor(Math.random() * 80) -40 + 'px', animationDelay: Math.random() * 1 + 's' }">
           </div>
         </div>
@@ -31,18 +32,38 @@
     </button>
     <div 
       class="choices"
-      v-if="activeFighters.length">
+      v-bind:class="{ active: activeFighters.length }">
       <div 
         class="left"
-        @click="voteLeft()">
-        <span>{{ this.activeFighters[0].name }}</span>
-        <span>{{ this.activeFighters[0].count }}</span>
+        @click="voteLeft()"
+        v-bind:style="{ width: votePercent}">
+        <div 
+          class="wrapper"
+          v-if="activeFighters.length">
+          <span>{{ this.activeFighters[0].name }}</span>
+          <span>{{ this.activeFighters[0].count }}</span>
+        </div>
+        <div 
+          class="wrapper"
+          v-else>
+          Waiting for the next round
+        </div>
       </div>
       <div 
         class="right"
-        @click="voteRight()">
-        <span>{{ this.activeFighters[1].name }}</span>
-        <span>{{ this.activeFighters[1].count }}</span>
+        @click="voteRight()"
+        v-bind:class="{ active: activeFighters.length }">
+        <div 
+          class="wrapper"
+          v-if="activeFighters.length">
+          <span>{{ this.activeFighters[1].name }}</span>
+          <span>{{ this.activeFighters[1].count }}</span>
+        </div>
+        <div 
+          class="wrapper"
+          v-else>
+          Waiting for the next round
+        </div>
       </div>
     </div>
   </div>
@@ -83,6 +104,13 @@ export default {
   computed: {
     newRound: function() {
       return this.activeFighters.length ? false : true;
+    },
+    votePercent: function() {
+      if(this.activeFighters.length) {
+        return this.activeFighters[0].count / (this.activeFighters[0].count + this.activeFighters[1].count) * 100 +'%';
+      } else {
+        return '50%';
+      }
     }
   },
   methods: {
@@ -125,6 +153,7 @@ export default {
         this.step = 0;
         this.round++;
         this.x *= 2;
+        this.fighters.forEach(fighter => fighter.count = 0); 
       }
     },
     isActiveFighter: function(fighter) {
@@ -147,15 +176,20 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  > h3 {
+    font-family: 'umberto';
+    font-size: 64px;
+    height: 54px;
+    color: #ff7675;
+  }
   .lane {
-    width: 70%;
+    height: 400px;
     display: flex;
     align-items: center;
-    justify-content: center;
     .fighters {
       display: flex;
-      align-items: center;
+      align-self: flex-end;
       .fighter {
         margin: 0 7px; 
         display: flex;
@@ -202,25 +236,43 @@ export default {
     }
   }
   .choices {
-    position: fixed;
-    bottom: 0;
     width: 100%;
     display: flex;
     align-items: center;
+    cursor: not-allowed;
+    &.active {
+      cursor: pointer;
+      .left {
+        background-color: #FF7675;
+      }
+      .right {
+        background-color: #42aaf5;
+      }
+    }
     .left, .right {
-      width: 50%;
+      font-family: 'umberto', 'niveau-grotesk-small-caps';
+      font-size: 24px;
+      min-width: 25%;
       height: 100px;
+      background-color: rgb(15, 15, 15);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      transition: all .5s ease;
+      > div {
+        display: flex;
+        flex-direction: column;
+      }
     }
     .left {
-      background-color: #FF7675;
+      width: 50%;
     }
     .right {
-      background-color: #42aaf5;
+      flex: 1;
     }
+    
   }
 }
 

@@ -75,32 +75,56 @@ export default {
     },
     activeGame: false,
     activeFighters: [],
+    subset: [],
     step: 0,
-    
+    round: 1,
+    x: 32
   }),
   computed: {
+    newRound: function() {
+      return this.activeFighters.length ? false : true;
+    }
   },
   methods: {
     nextStep() {
+      if(this.newRound) {
+        this.subset = this.fighters.filter(fighter => fighter.status == "alive")
+      }
+
       if(this.activeFighters.length) {
+        // LEFT WINS
         if(this.activeFighters[0].count > this.activeFighters[1].count) {
           this.fighters[this.activeFighters[1].id].status = "dead";
-          this.fighters[this.activeFighters[0].id].x += 32;
-          this.fighters[this.activeFighters[1].id].y += 100;
+          if(this.fighters[this.activeFighters[0].id].x == 0) {
+            this.fighters[this.activeFighters[0].id].x += 32;
+          } else {
+            let x = this.fighters[this.activeFighters[0].id].x;
+            this.fighters[this.activeFighters[0].id].x = x + this.x;
+          }
+          this.fighters[this.activeFighters[1].id].y += 80;
+        // RIGHT WINS
         } else {
           this.fighters[this.activeFighters[0].id].status = "dead";
-          this.fighters[this.activeFighters[1].id].x -= 32;
-          this.fighters[this.activeFighters[0].id].y += 100;
+          if(this.fighters[this.activeFighters[0].id].x == 0) {
+            this.fighters[this.activeFighters[1].id].x -= 32;
+          } else {
+            let x = this.fighters[this.activeFighters[1].id].x;
+            this.fighters[this.activeFighters[1].id].x = x - this.x;
+          }
+          this.fighters[this.activeFighters[0].id].y += 80;
         }
       }
 
-      if(this.step < this.fighters.length) {
-        this.activeFighters = [this.fighters[this.step], this.fighters[this.step + 1]]
-        this.fighters[this.activeFighters[0].id].y -= 100;
-        this.fighters[this.activeFighters[1].id].y -= 100;
+      if(this.step < this.subset.length) {
+        this.activeFighters = [this.subset[this.step], this.subset[this.step + 1]]
+        this.fighters[this.activeFighters[0].id].y -= 80;
+        this.fighters[this.activeFighters[1].id].y -= 80;
         this.step += 2;
       } else {
         this.activeFighters = [];
+        this.step = 0;
+        this.round++;
+        this.x *= 2;
       }
     },
     isActiveFighter: function(fighter) {

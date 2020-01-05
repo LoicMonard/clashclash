@@ -22,6 +22,9 @@ html, body {
   text-align: center;
   height: 100%;
 }
+.colored {
+  color: #ff5656;
+}
 h1 {
   font-weight: 500;
   font-family: niveau-grotesk-small-caps, sans-serif;
@@ -97,7 +100,9 @@ input[type=text], input[type=email], input[type=password] {
     border: 1px solid #ff7675;
   }
   &::placeholder {
-    color: #e9e9e9;
+    color: #696969;
+    font-style: italic;
+    font-size: 12px;
   }
 }
 label {
@@ -106,5 +111,12 @@ label {
   text-align: left;
   color: #5f5f5f;
   font-size: 14px;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0
 }
 </style>

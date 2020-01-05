@@ -4,6 +4,34 @@
   </div>
 </template>
 
+<script>
+import { auth } from './firebase/index'
+import { mapActions } from "vuex";
+import store from "./store";
+
+export default {
+  name: 'app',
+  mounted() {
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        // User is signed in.
+        var displayName = user.displayName;
+        var email = user.email;
+        var emailVerified = user.emailVerified;
+        var photoURL = user.photoURL;
+        var isAnonymous = user.isAnonymous;
+        var uid = user.uid;
+        var providerData = user.providerData;
+        store.dispatch("fetchUser", user);
+        console.log(user.email);
+      } else {
+        console.log('no user');
+      }
+    });
+  }
+}
+</script>
+
 <style lang="scss">
 html, body {
   margin: 0;

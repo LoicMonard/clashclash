@@ -12,13 +12,18 @@
               v-for="(fighter, index) in fighters"
               :key="index"
               v-bind:style="{transform: `translate(${fighter.x}px,${fighter.y}px)`}">
-              <img src="../assets/spyware.svg">
+              <img 
+                src="../assets/spyware.svg"
+                v-if="!fighter.url">
+              <img 
+                :src="fighter.url"
+                v-else>
               <span class="name">
                 {{ fighter.name }}
               </span>
               <div
                 class="fires"
-                v-if="isActiveFighter(fighter)">
+                v-if="fighter.status == 'fighting'">
                 <img 
                   class="fire"
                   v-for="i in 10"
@@ -31,12 +36,13 @@
         </div>
         <button 
           class="filled"
-          @click="nextStep()">
+          @click="nextStep()"
+          v-if="user.email == roomData.author">
           Next
         </button>
         <div 
           class="choices"
-          v-bind:class="{ active: activeFighters.length }">
+          v-bind:class="{ active: fightingPlayers }">
           <div 
             class="left"
             @click="voteLeft()"
@@ -131,17 +137,21 @@ export default {
         return '50%';
       }
     },
+    fightingPlayers: function() {
+      return this.fighters.find(elem => elem.status == "fighting");
+    }
   },
   methods: {
     nextStep() {
       if(this.newRound) {
-        this.subset = this.fighters.filter(fighter => fighter.status == "alive")
+        this.subset = this.fighters.filter(fighter => fighter.status == "alive" || fighter.status == "fighting")
       }
 
       if(this.activeFighters.length) {
         // LEFT WINS
         if(this.activeFighters[0].count > this.activeFighters[1].count) {
           this.fighters[this.activeFighters[1].id].status = "dead";
+          this.fighters[this.activeFighters[0].id].status = "alive";
           if(this.fighters[this.activeFighters[0].id].x == 0) {
             this.fighters[this.activeFighters[0].id].x += 32;
           } else {
@@ -152,6 +162,7 @@ export default {
         // RIGHT WINS
         } else {
           this.fighters[this.activeFighters[0].id].status = "dead";
+          this.fighters[this.activeFighters[1].id].status = "alive";
           if(this.fighters[this.activeFighters[0].id].x == 0) {
             this.fighters[this.activeFighters[1].id].x -= 32;
           } else {
@@ -164,6 +175,8 @@ export default {
 
       if(this.step < this.subset.length) {
         this.activeFighters = [this.subset[this.step], this.subset[this.step + 1]]
+        this.fighters[this.activeFighters[0].id].status = "fighting";
+        this.fighters[this.activeFighters[1].id].status = "fighting";
         // this.fighters.find(elem => elem === this.activeFighters[0]).y -= 80;
         // this.fighters.find(elem => elem === this.activeFighters[1]).y -= 80;
         // console.log(`${this.fighters[0].y}, ${this.fighters[1].y}`);
@@ -257,7 +270,9 @@ export default {
               filter: grayscale(1);
             }
           }
-          img {
+          > img {
+            height: 50px;
+            object-fit: cover;
             width: 50px;
             border-radius: 50%;
           }

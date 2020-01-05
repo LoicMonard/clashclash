@@ -20,17 +20,17 @@
         class="create"
         v-else
         :key=2>
-        <label v-if="!this.connected">
+        <label v-if="!this.user.email">
           In order to create a room, please sign in
         </label>
         <div 
           class="google-signin"
-          v-if="!this.connected"
+          v-if="!this.user.email"
           @click="googleRegister()">
           <img src="../assets/g-logo.png"/>
           <span>Sign in with Google</span>
         </div>
-        <div v-else-if="this.connected && this.step == 1">
+        <div v-else-if="this.user.email && this.step == 1">
           <label for="title">Title <span class="colored">{{ titleError }}</span></label>
           <input 
             type="text"
@@ -45,7 +45,7 @@
             Next
           </button>
         </div>
-        <div v-else-if="this.connected && this.step == 2">
+        <div v-else-if="this.user.email && this.step == 2">
           <div 
             class="fighters"
             v-if="fighters.length">
@@ -86,12 +86,12 @@
 <script>
 import Room from "../components/Room"
 import { auth, authObj, db } from '../firebase/index'
+import { mapGetters } from "vuex";
 
 export default {
   name: 'home',
   data: () => ({
     join: false,
-    connected: true,
     title: "",
     titleError: "",
     password: "",
@@ -106,17 +106,21 @@ export default {
     ],
     fighters: []
   }),
-  firestore: {
-    //roomss: db.collection('rooms'),
+  computed: {
+    ...mapGetters({
+      user: "user"
+    })
   },
   methods: {
+    checkAuth() {
+      console.log(auth)
+    },
     googleRegister() {
       const provider = new authObj.GoogleAuthProvider();
       auth
         .signInWithPopup(provider)
         .then(data => {
-          console.log(`Google : ${data}`);
-          this.connected = true;
+          console.log(data.user.email);
         })
         .catch(err => {
           if (err.code === "auth/email-already-in-use") {
@@ -129,6 +133,7 @@ export default {
           console.log(err.message)
         });
     },
+
     manageRoom() {
       if(!this.title) {
         this.titleError = "This field should be renseigné";
@@ -144,7 +149,8 @@ export default {
         public: this.password ? false : true,
         theme: 'Theme',
         active: true,
-        step: 0
+        step: 0,
+        author: user.email
       })
       .then(function(docRef) {
         console.log("Document written with ID: ", docRef.id);

@@ -4,14 +4,14 @@
     v-bind:class="{ locked: room.public }">
     <div class="wrapper">
       <label class="title">
-        {{ room.title }}
+        {{ room.data.title }}
       </label>
       <label class="theme">
-        {{ room.theme }}
+        {{ room.data.theme }}
       </label>
       <img 
         src="../assets/insecure.svg"
-        v-if="room.public">
+        v-if="room.data.public">
       <img 
         src="../assets/safe.svg"
         v-else>
@@ -28,7 +28,7 @@ export default {
   }),
   methods: {
     joinRoom() {
-      this.$router.push('board');
+      this.$router.push(`board/${this.room.id}`);
     }
   }
 }

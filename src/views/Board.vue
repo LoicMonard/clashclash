@@ -42,16 +42,16 @@
         </button>
         <div 
           class="choices"
-          v-bind:class="{ active: fightingPlayers }">
+          v-bind:class="{ active: fightingPlayers.length }">
           <div 
             class="left"
             @click="voteLeft()"
             v-bind:style="{ width: votePercent}">
             <div 
               class="wrapper"
-              v-if="activeFighters.length">
-              <span>{{ this.activeFighters[0].name }}</span>
-              <span>{{ this.activeFighters[0].count }}</span>
+              v-if="fightingPlayers.length">
+              <span>{{ roomData.firstFighter.name }}</span>
+              <span>{{ roomData.firstFighter.score }}</span>
               <div
                 class="assets">
                 <img 
@@ -74,9 +74,9 @@
             v-bind:class="{ active: activeFighters.length }">
             <div 
               class="wrapper"
-              v-if="activeFighters.length">
-              <span>{{ this.activeFighters[1].name }}</span>
-              <span>{{ this.activeFighters[1].count }}</span>
+              v-if="fightingPlayers.length">
+              <span>{{ roomData.secondFighter.name }}</span>
+              <span>{{ roomData.secondFighter.score }}</span>
               <div
                 class="assets">
                 <img 
@@ -111,6 +111,7 @@
 
 <script>
 import { auth, authObj, db } from '../firebase/index'
+import { mapGetters } from "vuex";
 
 export default {
   name: 'board',
@@ -127,18 +128,27 @@ export default {
     doc: ''
   }),
   computed: {
+    ...mapGetters({
+      user: "user"
+    }),
     newRound: function() {
       return this.activeFighters.length ? false : true;
     },
     votePercent: function() {
-      if(this.activeFighters.length) {
-        return this.activeFighters[0].count / (this.activeFighters[0].count + this.activeFighters[1].count) * 100 +'%';
+      if(this.fightingPlayers.length) {
+        if(this.roomData.firstFighter.score == 0 && this.roomData.secondFighter.score == 0) {
+          return '50%';
+        }
+        else {
+          return this.roomData.firstFighter.score / (this.roomData.firstFighter.score + this.roomData.secondFighter.score) * 100 +'%';
+        }
       } else {
+        console.log('50% mec');
         return '50%';
       }
     },
     fightingPlayers: function() {
-      return this.fighters.find(elem => elem.status == "fighting");
+      return this.fighters.filter(elem => elem.status == "fighting");
     }
   },
   methods: {
@@ -149,7 +159,7 @@ export default {
 
       if(this.activeFighters.length) {
         // LEFT WINS
-        if(this.activeFighters[0].count > this.activeFighters[1].count) {
+        if(this.roomData.firstFighter.score > this.roomData.secondFighter.score) {
           this.fighters[this.activeFighters[1].id].status = "dead";
           this.fighters[this.activeFighters[0].id].status = "alive";
           if(this.fighters[this.activeFighters[0].id].x == 0) {
@@ -175,6 +185,17 @@ export default {
 
       if(this.step < this.subset.length) {
         this.activeFighters = [this.subset[this.step], this.subset[this.step + 1]]
+        db.collection("rooms").doc(this.$route.params.id)
+        .update({
+          firstFighter: { id: this.activeFighters[0].id ,name: this.activeFighters[0].name, score: 0 },
+          secondFighter: { id: this.activeFighters[1].id ,name: this.activeFighters[1].name, score: 0 }
+        }).then(function() {
+          console.log('score 1 ++ ');
+        })
+        .catch(function(error) {
+          // The document probably doesn't exist.
+          console.error("Error updating document: ", error);
+        });
         this.fighters[this.activeFighters[0].id].status = "fighting";
         this.fighters[this.activeFighters[1].id].status = "fighting";
         // this.fighters.find(elem => elem === this.activeFighters[0]).y -= 80;
@@ -209,10 +230,34 @@ export default {
       return this.activeFighters.includes(fighter)
     },
     voteLeft() {
-      this.activeFighters[0].count += 1;
+      let score = this.roomData.firstFighter.score;
+      score++;
+      let that = this;
+      db.collection("rooms").doc(this.$route.params.id)
+        .update({
+          firstFighter: { name: that.fightingPlayers[0].name, score: score }
+        }).then(function() {
+          console.log('score 1 ++ ');
+        })
+        .catch(function(error) {
+          // The document probably doesn't exist.
+          console.error("Error updating document: ", error);
+        });
     },
     voteRight() {
-      this.activeFighters[1].count += 1;
+      let score = this.roomData.secondFighter.score;
+      score++;
+      let that = this;
+      db.collection("rooms").doc(this.$route.params.id)
+        .update({
+          secondFighter: { name: that.fightingPlayers[1].name, score: score }
+        }).then(function() {
+          console.log('score 2 ++ ');
+        })
+        .catch(function(error) {
+          // The document probably doesn't exist.
+          console.error("Error updating document: ", error);
+        });
     }
   },
   created() {

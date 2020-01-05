@@ -150,7 +150,9 @@ export default {
         theme: 'Theme',
         active: true,
         step: 0,
-        author: user.email
+        author: this.user.email,
+        firstFighter: { id: 0, name: "", score: 0 },
+        secondFighter: { id: 0, name: "", score: 0 }
       })
       .then(function(docRef) {
         console.log("Document written with ID: ", docRef.id);
@@ -175,8 +177,9 @@ export default {
     .onSnapshot(function(snapshot) {
       snapshot.docChanges().forEach(function(change) {
         if (change.type === "added") {
-          that.roomss.push(change.doc.data());
+          that.roomss.push({id: change.doc.id, data: change.doc.data()})
           console.log("New city: ", change.doc.data());
+          console.log(change.doc.id);
         }
         if (change.type === "modified") {
           let obj = that.roomss.find(elem => elem.title = change.doc.data().title);

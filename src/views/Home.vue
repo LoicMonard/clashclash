@@ -177,6 +177,10 @@ export default {
 
       let arr = this.randomFighters ? shuffleArray(this.fighters) : this.fighters;
       
+      for(let i = 0; i < arr.length; i++) {
+        arr[i].id = i;
+      }
+
       let that = this;
       db.collection("rooms").add({
         title: this.title,
@@ -206,7 +210,7 @@ export default {
   },
   created() {
     for(let i = 0; i < 16; i++) {
-      this.fighters.push({ id: i, name: "Noname", url: "", x: 0, y: 0, status: "alive", count: 0 });
+      this.fighters.push({ name: "Noname", url: "", x: 0, y: 0, status: "alive", count: 0 });
     }
     let that = this;
 

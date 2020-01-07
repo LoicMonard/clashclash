@@ -208,29 +208,12 @@ export default {
       }
 
       if(this.activeFighters.length) {
-        // LEFT WINS
-        if(this.roomData.firstFighter.score > this.roomData.secondFighter.score) {
-          this.fighters[this.activeFighters[1].id].status = "dead";
-          this.fighters[this.activeFighters[0].id].status = "alive";
-          if(this.fighters[this.activeFighters[0].id].x == 0) {
-            this.fighters[this.activeFighters[0].id].x += 32;
-          } else {
-            let x = this.fighters[this.activeFighters[0].id].x;
-            this.fighters[this.activeFighters[0].id].x = x + this.x;
-          }
-          this.fighters[this.activeFighters[1].id].y += 80;
-        // RIGHT WINS
-        } else {
-          this.fighters[this.activeFighters[0].id].status = "dead";
-          this.fighters[this.activeFighters[1].id].status = "alive";
-          if(this.fighters[this.activeFighters[0].id].x == 0) {
-            this.fighters[this.activeFighters[1].id].x -= 32;
-          } else {
-            let x = this.fighters[this.activeFighters[1].id].x;
-            this.fighters[this.activeFighters[1].id].x = x - this.x;
-          }
-          this.fighters[this.activeFighters[0].id].y += 80;
+        if(this.roomData.firstFighter.score == this.roomData.secondFighter.score) {
+          let oneOrZero = (Math.random()>0.5) ? 1 : 0
+          if(oneOrZero == 1) this.roomData.firstFighter.score++;
+          else this.roomData.secondFighter.score++;
         }
+        this.computeScore();
       }
 
       if(this.step < this.subset.length) {
@@ -284,6 +267,31 @@ export default {
       .catch(function(error) {
         console.error("Error updating actvity document: ", error);
       });
+    },
+    computeScore() {
+      // LEFT WINS
+      if(this.roomData.firstFighter.score > this.roomData.secondFighter.score) {
+        this.fighters[this.activeFighters[1].id].status = "dead";
+        this.fighters[this.activeFighters[0].id].status = "alive";
+        if(this.fighters[this.activeFighters[0].id].x == 0) {
+          this.fighters[this.activeFighters[0].id].x += 32;
+        } else {
+          let x = this.fighters[this.activeFighters[0].id].x;
+          this.fighters[this.activeFighters[0].id].x = x + this.x;
+        }
+        this.fighters[this.activeFighters[1].id].y += 80;
+      // RIGHT WINS
+      } else {
+        this.fighters[this.activeFighters[0].id].status = "dead";
+        this.fighters[this.activeFighters[1].id].status = "alive";
+        if(this.fighters[this.activeFighters[0].id].x == 0) {
+          this.fighters[this.activeFighters[1].id].x -= 32;
+        } else {
+          let x = this.fighters[this.activeFighters[1].id].x;
+          this.fighters[this.activeFighters[1].id].x = x - this.x;
+        }
+        this.fighters[this.activeFighters[0].id].y += 80;
+      }
     },
     endRoom() {
       let that = this;

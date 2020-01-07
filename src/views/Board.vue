@@ -58,6 +58,11 @@
         <div class="buttons">
           <button 
             class="filled"
+            @click="$router.push('/home')">
+            Back
+          </button>
+          <button 
+            class="filled"
             @click="nextStep()"
             v-if="user.email == roomData.author">
             Next

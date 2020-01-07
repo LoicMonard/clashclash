@@ -77,7 +77,7 @@
                 v-model="fighter.name">
               <input 
                 type="text"
-                placeholder="Avatar"
+                placeholder="Avatar URL"
                 v-model="fighter.url">
             </div>
           </div>

@@ -167,11 +167,6 @@ export default {
     clocker: 0,
     copied: false
   }),
-  watch: {
-    clocker: function() {
-      console.log('Fight changed');
-    }
-  },
   computed: {
     ...mapGetters({
       user: "user"
@@ -223,10 +218,9 @@ export default {
           firstFighter: { id: this.activeFighters[0].id ,name: this.activeFighters[0].name, score: 0 },
           secondFighter: { id: this.activeFighters[1].id ,name: this.activeFighters[1].name, score: 0 }
         }).then(function() {
-          console.log('score 1 ++ ');
         })
         .catch(function(error) {
-          console.error("Error updating document: ", error);
+          console.error("Error updating rooms document: ", error);
         });
         this.fighters[this.activeFighters[0].id].status = "fighting";
         this.fighters[this.activeFighters[1].id].status = "fighting";
@@ -247,11 +241,10 @@ export default {
           step: that.turn,
           fighters: that.fighters
         }).then(function() {
-          console.log('ok updaté');
           that.turn++;
         })
         .catch(function(error) {
-          console.error("Error updating document: ", error);
+          console.error("Error updating rooms document: ", error);
         });
 
       let clocker = this.clocker;
@@ -262,7 +255,6 @@ export default {
         clocker: clocker
       }).then(function() {
         that.voted = false;
-        console.log('Cloker updated');
       })
       .catch(function(error) {
         console.error("Error updating actvity document: ", error);
@@ -319,7 +311,6 @@ export default {
           .update({
             firstFighter: { name: that.fightingPlayers[0].name, score: score }
           }).then(function() {
-            console.log('score 1 ++ ');
           })
           .catch(function(error) {
             // The document probably doesn't exist.
@@ -337,11 +328,9 @@ export default {
           .update({
             secondFighter: { name: that.fightingPlayers[1].name, score: score }
           }).then(function() {
-            console.log('score 2 ++ ');
           })
           .catch(function(error) {
-            // The document probably doesn't exist.
-            console.error("Error updating document: ", error);
+            console.error("Error updating rooms document: ", error);
           });
       }
       this.voted = true;
@@ -360,9 +349,8 @@ export default {
     db.collection("rooms").doc(this.$route.params.id)
       .onSnapshot(function(doc) {
         that.roomData = doc.data();
-        console.log('Reset mec :/');
       }, function(error) {
-        console.error(`Error: ${error}`)
+        console.error(error)
       });
 
     db.collection("activity").doc(this.$route.params.id)

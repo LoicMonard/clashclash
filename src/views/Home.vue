@@ -134,25 +134,14 @@ export default {
     })
   },
   methods: {
-    checkAuth() {
-      console.log(auth)
-    },
     googleRegister() {
       const provider = new authObj.GoogleAuthProvider();
       auth
         .signInWithPopup(provider)
         .then(data => {
-          console.log(data.user.email);
         })
         .catch(err => {
-          if (err.code === "auth/email-already-in-use") {
-            this.emailError = "Email déjà utilisé"
-          } else if (err.code === "auth/invalid-email") {
-            this.emailError = "Email mal formatté"
-          } else if (err.code === "auth/weak-password") {
-            this.passwordError = "Mot de passe trop faible"
-          }
-          console.log(err.message)
+          console.error(err.message);
         });
     },
 
@@ -176,7 +165,7 @@ export default {
         .map(a => a[1]);
 
       let arr = this.randomFighters ? shuffleArray(this.fighters) : this.fighters;
-      
+
       for(let i = 0; i < arr.length; i++) {
         arr[i].id = i;
       }
@@ -200,7 +189,6 @@ export default {
         db.collection("activity").doc(docRef.id).set({
           clocker: 0
         })
-        console.log("Document written with ID: ", docRef.id);
         that.$router.push(`board/${docRef.id}`);
       })
       .catch(function(error) {
@@ -219,8 +207,6 @@ export default {
       snapshot.docChanges().forEach(function(change) {
         if (change.type === "added") {
           that.rooms.push({id: change.doc.id, data: change.doc.data()})
-          console.log("New city: ", change.doc.data());
-          console.log(change.doc.id);
         }
         if (change.type === "modified") {
           let obj = that.rooms.find(elem => elem.title = change.doc.data().title);
@@ -228,7 +214,6 @@ export default {
           that.rooms[index] = change.doc.data()
         }
         if (change.type === "removed") {
-          console.log("Removed city: ", change.doc.data());
         }
       });
     });

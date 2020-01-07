@@ -4,7 +4,28 @@
       <div 
         class="wrapper"
         v-if="fighters.length">
-        <h3>CLASHCLASH {{ $route.params.id }}</h3>
+        <div class="header">
+          <h3>CLASHCLASH</h3>
+          <div class="infos">
+            <div class="master">
+              <img src="../assets/crowns.svg">
+              <span>Master {{ user.displayName }}</span> 
+            </div>
+            <div class="theme">
+              <img src="../assets/explosion.svg">
+              <span>{{ roomData.theme }} : </span> 
+            </div>
+            <div class="url">
+              <input id="hiddenInput" type="hidden" :value="roomUrl">
+              <img src="../assets/papers.svg">
+              <span 
+                @click="copyUrl()"
+                v-bind:class="{copied: copied}">
+                Copy room url
+              </span>
+            </div>
+          </div>          
+        </div>
         <div class="lane">
           <div class="fighters">
             <div
@@ -34,18 +55,20 @@
             </div>
           </div>
         </div>
-        <button 
-          class="filled"
-          @click="nextStep()"
-          v-if="user.email == roomData.author">
-          Next
-        </button>
-        <button 
-          class="filled"
-          @click="endRoom()"
-          v-if="user.email == roomData.author">
-          End room
-        </button>
+        <div class="buttons">
+          <button 
+            class="filled"
+            @click="nextStep()"
+            v-if="user.email == roomData.author">
+            Next
+          </button>
+          <button 
+            class=""
+            @click="endRoom()"
+            v-if="user.email == roomData.author">
+            End room
+          </button>
+        </div>
         <div 
           class="choices"
           v-bind:class="{ active: fightingPlayers.length }">
@@ -132,7 +155,8 @@ export default {
     x: 32,
     doc: '',
     voted: false,
-    clocker: 0
+    clocker: 0,
+    copied: false
   }),
   watch: {
     clocker: function() {
@@ -163,6 +187,9 @@ export default {
     },
     fightingPlayers: function() {
       return this.fighters.filter(elem => elem.status == "fighting").length ? this.fighters.filter(elem => elem.status == "fighting") : [];
+    },
+    roomUrl: function() {
+      return `http://localhost:8080${this.$route.path}`;
     }
   },
   methods: {
@@ -301,6 +328,14 @@ export default {
           });
       }
       this.voted = true;
+    },
+    copyUrl() {
+      let urlToCopy = document.querySelector('#hiddenInput');
+      urlToCopy.setAttribute('type', 'text');
+      urlToCopy.select();
+      document.execCommand("copy");
+      this.copied = true;
+      urlToCopy.setAttribute('type', 'hidden')
     }
   },
   mounted() {
@@ -338,11 +373,47 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    > h3 {
-      font-family: 'umberto';
-      font-size: 64px;
-      height: 54px;
-      color: #ff7675;
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      > h3 {
+        font-family: 'umberto', 'niveau-grotesk-small-caps';
+        font-size: 64px;
+        height: 64px;
+        margin-bottom: 20px;
+        color: #ff7675;
+      }
+      .infos {
+        display: flex;
+        flex-direction: row;
+        > * {
+          margin: 0 10px;
+          font-style: italic;
+          font-family: 'niveau-grotesk-small-caps';
+          color: rgb(116, 116, 116);
+        }
+        .master, .theme, .url {
+          display: flex;
+          align-items: center;
+          color: rgb(116, 116, 116);
+          transition: all .3s ease;
+          > img {
+            height: 20px;
+          }
+          > span {
+            font-size: 16px;
+            margin: 0 4px;
+          }
+        }
+        .url {
+          cursor: pointer;
+          & .copied {
+            color: #00DD7B !important;
+          }
+        }
+      }
     }
     .lane {
       height: 400px;
@@ -396,6 +467,12 @@ export default {
             }
           }
         }
+      }
+    }
+    .buttons {
+      display: flex;
+      > button {
+        margin: 0 4px;
       }
     }
     .choices {

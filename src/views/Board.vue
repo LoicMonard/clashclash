@@ -5,7 +5,7 @@
         class="wrapper"
         v-if="fighters.length">
         <div class="header">
-          <h3>CLASHCLASH</h3>
+          <h3>{{ roomData.title }}</h3>
           <div class="infos">
             <div class="master">
               <img src="../assets/crowns.svg">
@@ -13,7 +13,7 @@
             </div>
             <div class="theme">
               <img src="../assets/explosion.svg">
-              <span>{{ roomData.theme }} : </span> 
+              <span>Theme : {{ roomData.theme }}</span> 
             </div>
             <div class="url">
               <input id="hiddenInput" type="hidden" :value="roomUrl">
@@ -127,7 +127,7 @@
       <div 
         class="loading"
         v-else-if="fighters.length == 0">
-        Loading
+        <vue-element-loading :active="true" :is-full-screen="true" background-color="rgba(0, 0, 0, .5)" color="#ff7675"/>
       </div>
       <div 
         class="noRoomFound"
@@ -141,9 +141,13 @@
 <script>
 import { auth, authObj, db } from '../firebase/index'
 import { mapGetters } from "vuex";
+import VueElementLoading from 'vue-element-loading'
 
 export default {
   name: 'board',
+  components: {
+    VueElementLoading
+  },
   data: () => ({
     roomData: [],
     activeGame: false,
@@ -350,7 +354,9 @@ export default {
 
     db.collection("activity").doc(this.$route.params.id)
       .onSnapshot(function(doc) {
-        that.clocker = doc.data().clocker;
+        if(that.clocker) {
+          that.clocker = doc.data().clocker;
+        }
       }, function(error) {
         console.error(error);
       });
@@ -416,6 +422,7 @@ export default {
       }
     }
     .lane {
+      background-image: url('../assets/scheme.png');
       height: 400px;
       display: flex;
       align-items: center;

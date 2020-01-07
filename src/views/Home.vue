@@ -43,6 +43,10 @@
           <input 
             type="text"
             v-model="title">
+          <label for="title">Theme <span class="colored">{{ themeError }}</span></label>
+          <input 
+            type="text"
+            v-model="theme">
           <label for="password">Password</label>
           <input 
             type="text"
@@ -101,7 +105,9 @@ export default {
   data: () => ({
     join: false,
     title: "",
+    theme: "",
     titleError: "",
+    themeError: "",
     password: "",
     step: 1,
     rooms: [],
@@ -141,11 +147,18 @@ export default {
       } else {
         this.step = 2;
       }
+      
+      if(!this.theme) {
+        this.themeError = "This field should be renseigné";
+      } else {
+        this.step = 2;
+      }
     },
     createRoom() {
       let that = this;
       db.collection("rooms").add({
         title: this.title,
+        theme: this.theme,
         password: this.password,
         fighters: this.fighters,
         public: this.password ? false : true,

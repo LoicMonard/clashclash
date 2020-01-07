@@ -165,7 +165,7 @@ export default {
         theme: 'Theme',
         active: true,
         step: 0,
-        author: this.user.email,
+        author: this.user.displayName,
         firstFighter: { id: 0, name: "", score: 0 },
         secondFighter: { id: 0, name: "", score: 0 }
       })

@@ -9,7 +9,7 @@
           <div class="infos">
             <div class="master">
               <img src="../assets/crowns.svg">
-              <span>Master {{ user.displayName }}</span> 
+              <span>Master {{ roomData.author }}</span> 
             </div>
             <div class="theme">
               <img src="../assets/explosion.svg">

@@ -193,7 +193,7 @@ export default {
       return this.fighters.filter(elem => elem.status == "fighting").length ? this.fighters.filter(elem => elem.status == "fighting") : [];
     },
     roomUrl: function() {
-      return `http://localhost:8080${this.$route.path}`;
+      return `https://clashclashdeath.firebaseapp.com${this.$route.path}`;
     }
   },
   methods: {

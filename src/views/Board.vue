@@ -40,6 +40,12 @@
           v-if="user.email == roomData.author">
           Next
         </button>
+        <button 
+          class="filled"
+          @click="endRoom()"
+          v-if="user.email == roomData.author">
+          End room
+        </button>
         <div 
           class="choices"
           v-bind:class="{ active: fightingPlayers.length }">
@@ -117,7 +123,6 @@ export default {
   name: 'board',
   data: () => ({
     roomData: [],
-    fighters: [],
     activeGame: false,
     activeFighters: [],
     subset: [],
@@ -125,12 +130,22 @@ export default {
     turn: 1,
     round: 1,
     x: 32,
-    doc: ''
+    doc: '',
+    voted: false,
+    clocker: 0
   }),
+  watch: {
+    clocker: function() {
+      console.log('Fight changed');
+    }
+  },
   computed: {
     ...mapGetters({
       user: "user"
     }),
+    fighters: function() {
+      return this.roomData ? this.roomData.fighters : [];
+    },
     newRound: function() {
       return this.activeFighters.length ? false : true;
     },
@@ -143,12 +158,11 @@ export default {
           return this.roomData.firstFighter.score / (this.roomData.firstFighter.score + this.roomData.secondFighter.score) * 100 +'%';
         }
       } else {
-        console.log('50% mec');
         return '50%';
       }
     },
     fightingPlayers: function() {
-      return this.fighters.filter(elem => elem.status == "fighting");
+      return this.fighters.filter(elem => elem.status == "fighting").length ? this.fighters.filter(elem => elem.status == "fighting") : [];
     }
   },
   methods: {
@@ -193,14 +207,10 @@ export default {
           console.log('score 1 ++ ');
         })
         .catch(function(error) {
-          // The document probably doesn't exist.
           console.error("Error updating document: ", error);
         });
         this.fighters[this.activeFighters[0].id].status = "fighting";
         this.fighters[this.activeFighters[1].id].status = "fighting";
-        // this.fighters.find(elem => elem === this.activeFighters[0]).y -= 80;
-        // this.fighters.find(elem => elem === this.activeFighters[1]).y -= 80;
-        // console.log(`${this.fighters[0].y}, ${this.fighters[1].y}`);
         this.fighters[this.activeFighters[0].id].y -= 80;
         this.fighters[this.activeFighters[1].id].y -= 80;
         this.step += 2;
@@ -222,53 +232,92 @@ export default {
           that.turn++;
         })
         .catch(function(error) {
-          // The document probably doesn't exist.
           console.error("Error updating document: ", error);
         });
+
+      let clocker = this.clocker;
+      clocker++;
+
+      db.collection("activity").doc(that.$route.params.id)
+      .update({
+        clocker: clocker
+      }).then(function() {
+        that.voted = false;
+        console.log('Cloker updated');
+      })
+      .catch(function(error) {
+        console.error("Error updating actvity document: ", error);
+      });
+    },
+    endRoom() {
+      let that = this;
+      db.collection("rooms").doc(that.$route.params.id).delete().then(function() {
+        console.log("Room successfully deleted!");
+        db.collection("activity").doc(that.$route.params.id).delete().then(function() {
+          console.log("Activity successfully deleted!");
+          that.$router.push('/home');          
+        }).catch(function(error) {
+          console.error("Error removing activity document: ", error);
+        });
+      }).catch(function(error) {
+        console.error("Error removing room document: ", error);
+      });
     },
     isActiveFighter: function(fighter) {
       return this.activeFighters.includes(fighter)
     },
     voteLeft() {
-      let score = this.roomData.firstFighter.score;
-      score++;
-      let that = this;
-      db.collection("rooms").doc(this.$route.params.id)
-        .update({
-          firstFighter: { name: that.fightingPlayers[0].name, score: score }
-        }).then(function() {
-          console.log('score 1 ++ ');
-        })
-        .catch(function(error) {
-          // The document probably doesn't exist.
-          console.error("Error updating document: ", error);
-        });
+      if(!this.voted) {
+        let score = this.roomData.firstFighter.score;
+        score++;
+        let that = this;
+        db.collection("rooms").doc(this.$route.params.id)
+          .update({
+            firstFighter: { name: that.fightingPlayers[0].name, score: score }
+          }).then(function() {
+            console.log('score 1 ++ ');
+          })
+          .catch(function(error) {
+            // The document probably doesn't exist.
+            console.error("Error updating document: ", error);
+          });
+      }
+      this.voted = true;
     },
     voteRight() {
-      let score = this.roomData.secondFighter.score;
-      score++;
-      let that = this;
-      db.collection("rooms").doc(this.$route.params.id)
-        .update({
-          secondFighter: { name: that.fightingPlayers[1].name, score: score }
-        }).then(function() {
-          console.log('score 2 ++ ');
-        })
-        .catch(function(error) {
-          // The document probably doesn't exist.
-          console.error("Error updating document: ", error);
-        });
+      if(!this.voted) {
+        let score = this.roomData.secondFighter.score;
+        score++;
+        let that = this;
+        db.collection("rooms").doc(this.$route.params.id)
+          .update({
+            secondFighter: { name: that.fightingPlayers[1].name, score: score }
+          }).then(function() {
+            console.log('score 2 ++ ');
+          })
+          .catch(function(error) {
+            // The document probably doesn't exist.
+            console.error("Error updating document: ", error);
+          });
+      }
+      this.voted = true;
     }
   },
-  created() {
+  mounted() {
     let that = this; 
     db.collection("rooms").doc(this.$route.params.id)
       .onSnapshot(function(doc) {
         that.roomData = doc.data();
-        that.fighters = doc.data().fighters;
         console.log('Reset mec :/');
       }, function(error) {
         console.error(`Error: ${error}`)
+      });
+
+    db.collection("activity").doc(this.$route.params.id)
+      .onSnapshot(function(doc) {
+        that.clocker = doc.data().clocker;
+      }, function(error) {
+        console.error(error);
       });
   }
 }

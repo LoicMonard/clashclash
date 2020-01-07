@@ -4,14 +4,22 @@
     <transition name="fade" mode="out-in">
       <div
         class="join"
-        v-if="join"
+        v-if="join && rooms.length"
         :key=1>
         <div 
           class="rooms"
-          v-for="(room, index) in roomss"
+          v-for="(room, index) in rooms"
           :key="index">
           <Room v-bind:room="room"/>
         </div>
+        <label>
+          Want to create a room ? <span class="colored" @click="join = !join">It's over here</span>
+        </label>
+      </div>
+      <div
+        class="no-rooms"
+        v-else-if="join && !rooms.length">
+        <span>Seems like there's no room yet.</span>
         <label>
           Want to create a room ? <span class="colored" @click="join = !join">It's over here</span>
         </label>
@@ -96,14 +104,7 @@ export default {
     titleError: "",
     password: "",
     step: 1,
-    roomss: [],
-    rooms: [
-      { id: 1, title: "Room n°1", theme: "Youtubers", public: false, fighters: 16 },
-      { id: 2, title: "Room n°2", theme: "Superheros", public: true, fighters: 32 },
-      { id: 3, title: "Room n°3", theme: "Woman", public: true, fighters: 4 },
-      { id: 4, title: "Room n°4", theme: "Animals", public: false, fighters: 16 },
-      { id: 5, title: "Room n°5", theme: "Porn vids", public: false, fighters: 16 }
-    ],
+    rooms: [],
     fighters: []
   }),
   computed: {
@@ -142,6 +143,7 @@ export default {
       }
     },
     createRoom() {
+      let that = this;
       db.collection("rooms").add({
         title: this.title,
         password: this.password,
@@ -155,7 +157,11 @@ export default {
         secondFighter: { id: 0, name: "", score: 0 }
       })
       .then(function(docRef) {
+        db.collection("activity").doc(docRef.id).set({
+          clocker: 0
+        })
         console.log("Document written with ID: ", docRef.id);
+        that.$router.push(`board/${docRef.id}`);
       })
       .catch(function(error) {
         console.error("Error adding document: ", error);
@@ -167,33 +173,25 @@ export default {
       this.fighters.push({ id: i, name: "Noname", url: "", x: 0, y: 0, status: "alive", count: 0 });
     }
     let that = this;
-    // db.collection("rooms").doc("9rYtOb2UI3NXqCb5cA0k")
-    // .onSnapshot(function(doc) {
-    //     console.log("Current data: ", doc.data());
-    // });
-
 
     db.collection("rooms").where("active", "==", true)
     .onSnapshot(function(snapshot) {
       snapshot.docChanges().forEach(function(change) {
         if (change.type === "added") {
-          that.roomss.push({id: change.doc.id, data: change.doc.data()})
+          that.rooms.push({id: change.doc.id, data: change.doc.data()})
           console.log("New city: ", change.doc.data());
           console.log(change.doc.id);
         }
         if (change.type === "modified") {
-          let obj = that.roomss.find(elem => elem.title = change.doc.data().title);
-          let index = that.roomss.indexOf(obj);
-          that.roomss[index] = change.doc.data()
+          let obj = that.rooms.find(elem => elem.title = change.doc.data().title);
+          let index = that.rooms.indexOf(obj);
+          that.rooms[index] = change.doc.data()
         }
         if (change.type === "removed") {
           console.log("Removed city: ", change.doc.data());
         }
       });
     });
-
-
-
   },
   components: {
     Room
@@ -224,10 +222,23 @@ export default {
     color: #ff7675;
     cursor: pointer;
   }
-  .join, .create {
+  .join, .create, .no-rooms {
     min-width: 360px;
     display: flex;
     flex-direction: column;
+  }
+  .no-rooms {
+    > span {
+      background-color: #202020;
+      padding: 10px 18px;
+      margin: 10px 0;
+      border-radius: 4px;
+      margin: 20px 0;
+      text-align: left;
+      box-sizing: border-box;
+      border-left: 3px solid #ff7675;
+      color: rgb(126, 126, 126);
+    }
   }
   .create {
     > div {

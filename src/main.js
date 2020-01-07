@@ -3,10 +3,10 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import { firestorePlugin } from 'vuefire'
-
-
+import ToggleButton from 'vue-js-toggle-button'
 
 Vue.use(firestorePlugin)
+Vue.use(ToggleButton)
 
 Vue.config.productionTip = false
 

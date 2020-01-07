@@ -9,7 +9,7 @@
           <div class="infos">
             <div class="master">
               <img src="../assets/crowns.svg">
-              <span>Master {{ roomData.author }}</span> 
+              <span>Master {{ roomData.authorName }}</span> 
             </div>
             <div class="theme">
               <img src="../assets/explosion.svg">
@@ -62,16 +62,16 @@
             Back
           </button>
           <button 
-            class="filled"
-            @click="nextStep()"
-            v-if="user.email == roomData.author">
-            Next
-          </button>
-          <button 
             class=""
             @click="endRoom()"
             v-if="user.email == roomData.author">
             End room
+          </button>
+          <button 
+            class="filled"
+            @click="nextStep()"
+            v-if="user.email == roomData.author">
+            Next
           </button>
         </div>
         <div 

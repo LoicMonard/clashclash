@@ -58,6 +58,16 @@
           </button>
         </div>
         <div v-else-if="this.user.email && this.step == 2">
+          <div class="params">
+            <toggle-button 
+              :value="true"
+              v-model="randomFighters"
+              color="#00DD7B"
+              :labels="true"
+              :height="16"
+              :width="40"/>
+            <span>Random order</span>
+          </div>
           <div 
             class="fighters"
             v-if="fighters.length">
@@ -99,9 +109,13 @@
 import Room from "../components/Room"
 import { auth, authObj, db } from '../firebase/index'
 import { mapGetters } from "vuex";
+import { ToggleButton } from 'vue-js-toggle-button'
 
 export default {
   name: 'home',
+  components: {
+    ToggleButton
+  },
   data: () => ({
     join: false,
     title: "",
@@ -111,7 +125,8 @@ export default {
     password: "",
     step: 1,
     rooms: [],
-    fighters: []
+    fighters: [],
+    randomFighters: true
   }),
   computed: {
     ...mapGetters({
@@ -155,17 +170,25 @@ export default {
       }
     },
     createRoom() {
+      const shuffleArray = arr => arr
+        .map(a => [Math.random(), a])
+        .sort((a, b) => a[0] - b[0])
+        .map(a => a[1]);
+
+      let arr = this.randomFighters ? shuffleArray(this.fighters) : this.fighters;
+      
       let that = this;
       db.collection("rooms").add({
         title: this.title,
         theme: this.theme,
         password: this.password,
-        fighters: this.fighters,
+        fighters: arr,
         public: this.password ? false : true,
         theme: 'Theme',
         active: true,
         step: 0,
-        author: this.user.displayName,
+        author: this.user.email,
+        authorName: this.user.displayName,
         firstFighter: { id: 0, name: "", score: 0 },
         secondFighter: { id: 0, name: "", score: 0 }
       })
@@ -274,6 +297,16 @@ export default {
       img {
         height: 100%;
         margin: 0 10px;
+      }
+    }
+    .params {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+      > span {
+        font-size: 14px;
+        color: #727272;
+        margin: 0 5px;
       }
     }
     .fighters {

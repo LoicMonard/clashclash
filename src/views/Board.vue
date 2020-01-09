@@ -190,7 +190,7 @@ export default {
       user: "user"
     }),
     fighters: function() {
-      return this.roomData ? this.roomData.fighters : [];
+      return this.roomData.fighters ? this.roomData.fighters : [];
     },
     newRound: function() {
       return this.activeFighters.length ? false : true;

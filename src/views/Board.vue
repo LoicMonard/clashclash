@@ -339,6 +339,7 @@ export default {
     },
     voteLeft() {
       if(localStorage.getItem('voted') == "false") {
+        this.currentVote = 1;
         let score = this.roomData.firstFighter.score;
         score++;
         let that = this;
@@ -356,6 +357,7 @@ export default {
     },
     voteRight() {
       if(localStorage.getItem('voted') == "false") {
+        this.currentVote = 2;
         let score = this.roomData.secondFighter.score;
         score++;
         let that = this;
@@ -578,6 +580,9 @@ export default {
         text-align: center;
         overflow: hidden;
         transition: all 2s ease;
+        &.unvoted {
+          filter: grayscale(1);
+        }
         > div {
           display: flex;
           flex-direction: column;

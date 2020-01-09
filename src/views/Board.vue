@@ -95,7 +95,8 @@
           <div 
             class="left"
             @click="voteLeft()"
-            v-bind:style="{ width: votePercent}">
+            v-bind:style="{ width: votePercent}"
+            v-bind:class="{ unvoted: currentVote == 2 }">
             <div 
               class="wrapper"
               v-if="fightingPlayers.length">
@@ -120,7 +121,7 @@
           <div 
             class="right"
             @click="voteRight()"
-            v-bind:class="{ active: activeFighters.length }">
+            v-bind:class="{ unvoted: currentVote == 1 }">
             <div 
               class="wrapper"
               v-if="fightingPlayers.length">
@@ -183,7 +184,9 @@ export default {
     pseudo: "",
     pseudoError: "",
     start: false,
-    roomStep: ''
+    roomStep: '',
+    currentVote: 0,
+    refreshTimer: 0
   }),
   computed: {
     ...mapGetters({
@@ -220,8 +223,9 @@ export default {
       this.start = true;
     },
     roomStep: function() {
-      console.log('Step changed: ' + this.roomStep);
-      localStorage.setItem('voted', false);
+      if(this.refreshTimer > 1) {
+        localStorage.setItem('voted', false);
+      }
     }
   },
   methods: {
@@ -284,6 +288,7 @@ export default {
       .update({
         clocker: clocker
       }).then(function() {
+        console.log('Set local storage to false');
         localStorage.setItem('voted', false);
       })
       .catch(function(error) {
@@ -387,7 +392,10 @@ export default {
     db.collection("rooms").doc(this.$route.params.id)
       .onSnapshot(function(doc) {
         that.roomData = doc.data();
-        that.roomStep = doc.data().step;
+        if(doc.data()) {
+          that.roomStep = doc.data().step;
+          that.refreshTimer++;
+        }
       }, function(error) {
         console.error(error)
       });

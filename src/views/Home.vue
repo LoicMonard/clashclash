@@ -41,10 +41,12 @@
         <div v-else-if="this.user.email && this.step == 1">
           <label for="title">Title <span class="colored">{{ titleError }}</span></label>
           <input 
+            naùe="title"
             type="text"
             v-model="title">
-          <label for="title">Theme <span class="colored">{{ themeError }}</span></label>
+          <label for="theme">Theme <span class="colored">{{ themeError }}</span></label>
           <input 
+            name="theme"
             type="text"
             v-model="theme">
           <label for="password">Password</label>
@@ -177,7 +179,7 @@ export default {
         password: this.password,
         fighters: arr,
         public: this.password ? false : true,
-        theme: 'Theme',
+        theme: this.theme, 
         active: true,
         step: 0,
         author: this.user.email,

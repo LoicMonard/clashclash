@@ -1,9 +1,24 @@
 <template>
   <div class="board">
     <transition name="fade" mode="out-in">
+      <div
+        class="pseudoSelection"
+        v-if="!start">
+        <label
+          for="pseudo">
+          Pseudo <span class="colored">{{ pseudoError }}</span>
+        </label>
+        <input 
+          type="text" 
+          name="pseudo" 
+          v-model="pseudo">
+        <button @click="setPseudo()">
+          Start
+        </button>
+      </div>
       <div 
         class="wrapper"
-        v-if="fighters.length">
+        v-else-if="fighters.length">
         <div class="header">
           <h3>{{ roomData.title }}</h3>
           <div class="infos">
@@ -163,9 +178,12 @@ export default {
     round: 1,
     x: 32,
     doc: '',
-    voted: false,
     clocker: 0,
-    copied: false
+    copied: false,
+    pseudo: "",
+    pseudoError: "",
+    start: false,
+    roomStep: ''
   }),
   computed: {
     ...mapGetters({
@@ -194,6 +212,16 @@ export default {
     },
     roomUrl: function() {
       return `https://clashclashdeath.firebaseapp.com${this.$route.path}`;
+    }
+  },
+  watch: {
+    user: function() {
+      this.pseudo = this.user.displayName;
+      this.start = true;
+    },
+    roomStep: function() {
+      console.log('Step changed: ' + this.roomStep);
+      localStorage.setItem('voted', false);
     }
   },
   methods: {
@@ -248,13 +276,15 @@ export default {
         });
 
       let clocker = this.clocker;
+      console.log('Clocker 1: ' + clocker);
       clocker++;
+      console.log('Clocker 1: ' + clocker);
 
       db.collection("activity").doc(that.$route.params.id)
       .update({
         clocker: clocker
       }).then(function() {
-        that.voted = false;
+        localStorage.setItem('voted', false);
       })
       .catch(function(error) {
         console.error("Error updating actvity document: ", error);
@@ -303,7 +333,7 @@ export default {
       return this.activeFighters.includes(fighter)
     },
     voteLeft() {
-      if(!this.voted) {
+      if(localStorage.getItem('voted') == "false") {
         let score = this.roomData.firstFighter.score;
         score++;
         let that = this;
@@ -317,10 +347,10 @@ export default {
             console.error("Error updating document: ", error);
           });
       }
-      this.voted = true;
+      localStorage.setItem('voted', 'true');
     },
     voteRight() {
-      if(!this.voted) {
+      if(localStorage.getItem('voted') == "false") {
         let score = this.roomData.secondFighter.score;
         score++;
         let that = this;
@@ -333,7 +363,7 @@ export default {
             console.error("Error updating rooms document: ", error);
           });
       }
-      this.voted = true;
+      localStorage.setItem('voted', 'true');
     },
     copyUrl() {
       let urlToCopy = document.querySelector('#hiddenInput');
@@ -342,6 +372,14 @@ export default {
       document.execCommand("copy");
       this.copied = true;
       urlToCopy.setAttribute('type', 'hidden')
+    },
+    setPseudo() {
+      if(this.pseudo.length > 3) {
+        this.start = true;
+        localStorage.setItem('pseudo', this.pseudo);
+      } else {
+        this.pseudoError = "Pseudo should be at least 4 char";
+      }
     }
   },
   mounted() {
@@ -349,6 +387,7 @@ export default {
     db.collection("rooms").doc(this.$route.params.id)
       .onSnapshot(function(doc) {
         that.roomData = doc.data();
+        that.roomStep = doc.data().step;
       }, function(error) {
         console.error(error)
       });
@@ -357,10 +396,21 @@ export default {
       .onSnapshot(function(doc) {
         if(that.clocker) {
           that.clocker = doc.data().clocker;
+          console.log('Updated that.clocker with value: ' + doc.data().clocker)
         }
       }, function(error) {
         console.error(error);
       });
+
+    if(this.user.displayName) {
+      this.pseudo = this.user.displayName;
+      this.start = true;
+    }
+
+    if(localStorage.getItem('pseudo')) {
+      this.pseudo == localStorage.getItem('pseudo');
+      this.start = true;
+    }
   }
 }
 </script>
@@ -373,6 +423,15 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  .pseudoSelection {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    > button, input {
+      margin-bottom: 6px;
+    }
+  }
   .wrapper {
     height: 100%;
     width: 100%;

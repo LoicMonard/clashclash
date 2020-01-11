@@ -92,6 +92,10 @@
         <div 
           class="choices"
           v-bind:class="{ active: fightingPlayers.length }">
+          <ProgressBar 
+            :time="roomData.timer"
+            @timedOut="outOfTime()"
+            ref="progressBar"/>
           <div 
             class="left"
             @click="voteLeft()"
@@ -163,11 +167,13 @@
 import { auth, authObj, db } from '../firebase/index'
 import { mapGetters } from "vuex";
 import VueElementLoading from 'vue-element-loading'
+import ProgressBar from '../components/ProgressBar'
 
 export default {
   name: 'board',
   components: {
-    VueElementLoading
+    VueElementLoading,
+    ProgressBar
   },
   data: () => ({
     roomData: [],
@@ -215,6 +221,9 @@ export default {
     },
     roomUrl: function() {
       return `https://clashclashdeath.firebaseapp.com${this.$route.path}`;
+    },
+    remainingTime: function() {
+      return 
     }
   },
   watch: {
@@ -225,6 +234,7 @@ export default {
     roomStep: function() {
       if(this.refreshTimer > 1) {
         localStorage.setItem('voted', false);
+        this.$refs.progressBar.startTimer();
       }
     }
   },
@@ -386,6 +396,12 @@ export default {
         localStorage.setItem('pseudo', this.pseudo);
       } else {
         this.pseudoError = "Pseudo should be at least 4 char";
+      }
+    },
+    outOfTime() {
+      console.log('Out of time called');
+      if(this.user.email == this.roomData.author) {
+        this.nextStep();
       }
     }
   },
@@ -553,6 +569,11 @@ export default {
       }
     }
     .choices {
+      .progressBar {
+        position: absolute;
+        top: -10px;
+      }
+      position: relative;
       width: 100%;
       display: flex;
       align-items: center;

@@ -61,14 +61,42 @@
         </div>
         <div v-else-if="this.user.email && this.step == 2">
           <div class="params">
-            <toggle-button 
-              :value="true"
-              v-model="randomFighters"
-              color="#00DD7B"
-              :labels="true"
-              :height="16"
-              :width="40"/>
-            <span>Random order</span>
+            <div class="randomOrder">
+              <toggle-button 
+                :value="true"
+                v-model="randomFighters"
+                color="#00DD7B"
+                :labels="true"
+                :height="16"
+                :width="40"/>
+              <span>Random order</span>
+            </div>
+            <div class="timer">
+              <div class="toggle">
+                <toggle-button 
+                  :value="true"
+                  v-model="manualTimer"
+                  color="#00DD7B"
+                  :labels="true"
+                  :height="16"
+                  :width="40"/>
+                <span>Timer</span>
+              </div>
+              <div 
+                class="slider"
+                v-if="manualTimer">
+                <input 
+                  type="range"
+                  min="10"
+                  max="45"
+                  step="5"
+                  v-model="timer">
+                <span>
+                  <span class="colored">{{ timer }}</span>
+                  seconds
+                </span>
+              </div>
+            </div>
           </div>
           <div 
             class="fighters"
@@ -128,7 +156,9 @@ export default {
     step: 1,
     rooms: [],
     fighters: [],
-    randomFighters: true
+    randomFighters: true,
+    manualTimer: true,
+    timer: 5
   }),
   computed: {
     ...mapGetters({
@@ -185,7 +215,8 @@ export default {
         author: this.user.email,
         authorName: this.user.displayName,
         firstFighter: { id: 0, name: "", score: 0 },
-        secondFighter: { id: 0, name: "", score: 0 }
+        secondFighter: { id: 0, name: "", score: 0 },
+        timer: this.manualTimer ? this.timer : null
       })
       .then(function(docRef) {
         db.collection("activity").doc(docRef.id).set({
@@ -292,12 +323,25 @@ export default {
     }
     .params {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
+      flex-direction: column;
       margin: 10px 0;
-      > span {
+      span {
         font-size: 14px;
         color: #727272;
-        margin: 0 5px;
+        margin-left: 5px;
+      }
+      .randomOrder {
+      }
+      .timer {
+        width: 100%;
+        display: flex; 
+        flex-direction: row;
+        .slider {
+          margin-left: 20px;
+          display: flex;
+          align-items: center;
+        }
       }
     }
     .fighters {

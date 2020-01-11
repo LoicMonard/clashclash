@@ -42,7 +42,7 @@ html, body {
   height: 100%;
 }
 .colored {
-  color: #ff5656;
+  color: #ff5656 !important;
 }
 h1 {
   font-weight: 500;
@@ -131,7 +131,26 @@ label {
   color: #5f5f5f;
   font-size: 14px;
 }
+input[type="range"]{
+  -webkit-appearance:none;
+  height:2px;
+  background: #ff5656;
+  background-position:center;
+  background-repeat:no-repeat;
+  margin: auto;
+}
 
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:16px;
+  height:16px;
+  border-radius: 100%;
+  background: #434343;
+  position:relative;
+  border: 3px solid #ff5656;
+  z-index:3;
+  cursor: pointer;
+}
 .fade-enter-active, .fade-leave-active {
   transition: opacity .3s
 }

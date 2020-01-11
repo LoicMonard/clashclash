@@ -158,7 +158,7 @@ export default {
     fighters: [],
     randomFighters: true,
     manualTimer: true,
-    timer: this.manualTimer ? this.timer : null
+    timer: 30
   }),
   computed: {
     ...mapGetters({

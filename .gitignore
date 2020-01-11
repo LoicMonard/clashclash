@@ -105,3 +105,4 @@ dist
 
 # Firebase config file
 src/firebase/
+.firebase/

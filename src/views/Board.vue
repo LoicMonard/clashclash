@@ -234,6 +234,7 @@ export default {
     roomStep: function() {
       if(this.refreshTimer > 1) {
         localStorage.setItem('voted', false);
+        this.currentVote = 0;
         this.$refs.progressBar.startTimer();
       }
     }
@@ -571,7 +572,7 @@ export default {
     .choices {
       .progressBar {
         position: absolute;
-        top: -10px;
+        top: -6px;
       }
       position: relative;
       width: 100%;

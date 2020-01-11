@@ -1,8 +1,8 @@
 # clashclash
 <div align="center">
 <img height="64px" src="./src/assets/vueplusfire.png">
-<a href="./src/assets/screen2.png">
-    <img src="./src/assets/screen2.png">
+<a href="https://image.noelshack.com/fichiers/2020/02/6/1578760593-screen2.png">
+    <img src="https://image.noelshack.com/fichiers/2020/02/6/1578760593-screen2.png">
 </a>
 </div>
 

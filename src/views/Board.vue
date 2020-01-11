@@ -47,7 +47,7 @@
               v-bind:class="`fighter _ ${fighter.id} ${fighter.status}`"
               v-for="(fighter, index) in fighters"
               :key="index"
-              v-bind:style="{transform: `translate(${fighter.x}px,${fighter.y}px)`}">
+              v-bind:style="{transform: getTransformStyle(fighter)}">
               <img 
                 src="../assets/spyware.svg"
                 v-if="!fighter.url">
@@ -66,6 +66,16 @@
                   :key="i"
                   src="../assets/lightning.svg"
                   v-bind:style="{left: Math.floor(Math.random() * 80) -40 + 'px', animationDelay: Math.random() * 1 + 's' }">
+              </div>
+              <div
+                class="confettis"
+                v-else-if="fighter.status == 'winner'">
+                <img 
+                  class="confetti"
+                  v-for="i in 15"
+                  :key="i"
+                  src="../assets/confetti.svg"
+                  v-bind:style="{left: Math.floor(Math.random() * 80) -40 + 'px', top: Math.floor(Math.random() * 80) -40 + 'px', animationDelay: Math.random() * 1 + 's' }">
               </div>
             </div>
           </div>
@@ -265,6 +275,7 @@ export default {
 
       if(this.step < this.subset.length) {
         this.activeFighters = [this.subset[this.step], this.subset[this.step + 1]]
+        let test = this.subset.filter(elem => elem.status == "fighting");
         db.collection("rooms").doc(this.$route.params.id)
         .update({
           firstFighter: { id: this.activeFighters[0].id ,name: this.activeFighters[0].name, score: 0 },
@@ -318,8 +329,12 @@ export default {
     computeScore() {
       // LEFT WINS
       if(this.roomData.firstFighter.score > this.roomData.secondFighter.score) {
+        if(this.subset.length == 2) {
+          this.fighters[this.activeFighters[0].id].status = "winner";
+        } else {
+          this.fighters[this.activeFighters[0].id].status = "alive";
+        }
         this.fighters[this.activeFighters[1].id].status = "dead";
-        this.fighters[this.activeFighters[0].id].status = "alive";
         if(this.fighters[this.activeFighters[0].id].x == 0) {
           this.fighters[this.activeFighters[0].id].x += 32;
         } else {
@@ -329,8 +344,12 @@ export default {
         this.fighters[this.activeFighters[1].id].y += 80;
       // RIGHT WINS
       } else {
+        if(this.subset.length == 2) {
+          this.fighters[this.activeFighters[1].id].status = "winner";
+        } else {
+          this.fighters[this.activeFighters[1].id].status = "alive";
+        }
         this.fighters[this.activeFighters[0].id].status = "dead";
-        this.fighters[this.activeFighters[1].id].status = "alive";
         if(this.fighters[this.activeFighters[0].id].x == 0) {
           this.fighters[this.activeFighters[1].id].x -= 32;
         } else {
@@ -417,6 +436,13 @@ export default {
       console.log('Out of time called');
       if(this.user.email == this.roomData.author) {
         this.nextStep();
+      }
+    },
+    getTransformStyle(fighter) {
+      if(fighter.status == "winner") {
+        return `translate(${fighter.x}px,${fighter.y}px) scale(1.5)`;
+      } else {
+        return `translate(${fighter.x}px,${fighter.y}px)`;
       }
     }
   },
@@ -543,6 +569,9 @@ export default {
               filter: grayscale(1);
             }
           }
+          &.winner {
+            
+          }
           > img {
             height: 50px;
             object-fit: cover;
@@ -566,6 +595,14 @@ export default {
             z-index: -2;
             height: 25px;
             animation: sparkling 1s linear infinite;
+            animation-delay: random(5)s;
+          }
+          .confetti {
+            position: absolute;
+            opacity: 0;
+            z-index: -2;
+            height: 20px;
+            animation: popping 1s linear infinite;
             animation-delay: random(5)s;
           }
           &:hover {
@@ -658,6 +695,16 @@ export default {
     opacity: 0;
   } to {
     transform: translateY(-30px) scale(1.25);
+    opacity: 1;
+  }
+}
+
+@keyframes popping {
+  from {
+    transform: scale(1);
+    opacity: 0;
+  } to {
+    transform: scale(1.25);
     opacity: 1;
   }
 }

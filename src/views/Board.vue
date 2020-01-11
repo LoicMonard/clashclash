@@ -85,8 +85,14 @@
           <button 
             class="filled"
             @click="nextStep()"
-            v-if="user.email == roomData.author">
+            v-if="user.email == roomData.author && !roomData.timer">
             Next
+          </button>
+          <button 
+            class="filled"
+            @click="nextStep()"
+            v-if="user.email == roomData.author && roomData.timer && roomStep == 0">
+            Start game
           </button>
         </div>
         <div 
@@ -95,7 +101,8 @@
           <ProgressBar 
             :time="roomData.timer"
             @timedOut="outOfTime()"
-            ref="progressBar"/>
+            ref="progressBar"
+            v-if="roomData.timer"/>
           <div 
             class="left"
             @click="voteLeft()"
@@ -235,7 +242,9 @@ export default {
       if(this.refreshTimer > 1) {
         localStorage.setItem('voted', false);
         this.currentVote = 0;
-        this.$refs.progressBar.startTimer();
+        if(this.roomData.timer) {
+          this.$refs.progressBar.startTimer();
+        }
       }
     }
   },
@@ -344,6 +353,11 @@ export default {
       }).catch(function(error) {
         console.error("Error removing room document: ", error);
       });
+    },
+    startGame() {
+      if(this.roomStep == 0) {
+        this.nextStep();
+      }
     },
     isActiveFighter: function(fighter) {
       return this.activeFighters.includes(fighter)
